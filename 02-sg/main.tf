@@ -1,3 +1,13 @@
+module "db" {
+    source = "../../terraform-aws-sg"
+    project_name = var.project_name
+    environment = var.environment
+    sg_description = "SG for DB MySQL Instances"
+    vpc_id = data.aws_ssm_parameter.vpc_id.value
+    common_tags = var.common_tags
+    sg_name = "db"
+}
+
 module "ingress" {
   source         = "git::https://github.com/daws-76s/terraform-aws-security-group.git?ref=main"
   project_name = var.project_name
@@ -38,6 +48,16 @@ module "bastion" {
     sg_name = "bastion"
 }
 
+module "vpn" {
+    source = "../../terraform-aws-sg"
+    project_name = var.project_name
+    environment = var.environment
+    sg_description = "SG for vpn Instances"
+    vpc_id = data.aws_ssm_parameter.vpc_id.value
+    common_tags = var.common_tags
+    sg_name = "vpn"
+    ingress_rules = var.vpn_sg_rules
+}
 
 resource "aws_security_group_rule" "bastion_public" {
   type              = "ingress"
@@ -89,6 +109,25 @@ resource "aws_security_group_rule" "node_vpc" {
   security_group_id = module.node.sg_id
 }
 
+# RDS accepting connections from bastion
+resource "aws_security_group_rule" "db_bastion" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "TCP" # All traffic
+  source_security_group_id = module.bastion.sg_id
+  security_group_id = module.db.sg_id
+}
+
+# DB should accept connections from EKS nodes
+resource "aws_security_group_rule" "db_node" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "TCP" # All traffic
+  source_security_group_id = module.node.sg_id
+  security_group_id = module.db.sg_id
+}
 
 # Ingress ALB accepting traffic on 443
 resource "aws_security_group_rule" "ingress_public_https" {
