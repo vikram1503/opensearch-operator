@@ -36,7 +36,7 @@ module "eks" {
 
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
-    instance_types = ["t3.medium"]
+    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
   }
 
   eks_managed_node_groups = {
@@ -53,8 +53,8 @@ module "eks" {
     #   key_name = aws_key_pair.eks.key_name
     # }
     green = {
-      min_size      = 1
-      max_size      = 3
+      min_size      = 2
+      max_size      = 10
       desired_size  = 2
       capacity_type = "SPOT"
       iam_role_additional_policies = {

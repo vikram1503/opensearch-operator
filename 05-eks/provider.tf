@@ -7,7 +7,7 @@
   }
   backend "s3" {
     bucket = "imvicky"
-    key    = "OpenSearch-eks"
+    key    = "opensearch-dev-eks"
     region = "us-east-1"
     dynamodb_table = "terraform-remote-locking"
   }

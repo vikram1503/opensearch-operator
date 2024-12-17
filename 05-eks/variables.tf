@@ -1,6 +1,6 @@
 variable "common_tags" {
   default = {
-    Project     = "OpenSearch"
+    Project     = "opensearch"
     Environment = "dev"
     Terraform   = "true"
   }
@@ -11,7 +11,7 @@ variable "sg_tags" {
 }
 
 variable "project_name" {
-  default = "OpenSearch"
+  default = "opensearch"
 }
 variable "environment" {
   default = "dev"
